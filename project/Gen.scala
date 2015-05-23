@@ -1,8 +1,8 @@
 object Gen {
 
   def genTrove() = {
-		val ints = Seq("Int", "Long")
-		val floats = Seq("Float", "Double")
+    val ints = Seq("Int", "Long")
+    val floats = Seq("Float", "Double")
     val primitives = for (k <- ints; v <- ints ++ floats) yield (k, v)
     val op = for (k <- ints) yield (k, "Object")
     val po = for (v <- ints ++ floats) yield ("Object", v)
@@ -16,7 +16,7 @@ object Gen {
 
 
 
-	// ========== Map ===========
+  // ========== Map ===========
 
 
   def mkMapClass(_K: String, _V: String) = {
@@ -24,8 +24,8 @@ object Gen {
     val K = if (_K == "Object") "T" else _K
     val T = if (_K == "Object" || _V == "Object") "[T]" else ""
 
-		val AtroxType = s"${_K}${_V}Map${T}"
-		val TroveType = s"gnu.trove.map.hash.T${_K}${_V}HashMap${T}"
+    val AtroxType = s"${_K}${_V}Map${T}"
+    val TroveType = s"gnu.trove.map.hash.T${_K}${_V}HashMap${T}"
 
     s"""
 package atrox.trove {
@@ -69,8 +69,8 @@ package atrox.trove {
     override def apply(k: ${K}): ${V} =
       if (map.containsKey(k)) map.get(k) else throw new java.util.NoSuchElementException("key not found: "+k)
 
-		def getOrDefaultValue(k: $K): $V =
-			map.get(k)
+    def getOrDefaultValue(k: $K): $V =
+      map.get(k)
 
     override def clear(): Unit =
       map.clear()
@@ -78,8 +78,8 @@ package atrox.trove {
     override def contains(k: ${K}): Boolean =
       map.contains(k)
 
-		def containsValue(v: $V): Boolean =
-			map.containsValue(v)
+    def containsValue(v: $V): Boolean =
+      map.containsValue(v)
 
     //override def count(f: ((${K}, ${V}) => Boolean)): Int = ???
 
@@ -92,18 +92,18 @@ package atrox.trove {
       map.put(k, v)
 
     override def getOrElseUpdate(k: ${K}, v: => ${V}): ${V} = {
-			val res = map.get(k)
-			if (res == ${if (_V == "Object") "null" else "map.getNoEntryValue"} && !map.containsKey(k)) {
-				val value = v	
-				map.put(k, value)
-				value
-			} else {
-				res
-			}
-		}
+      val res = map.get(k)
+      if (res == ${if (_V == "Object") "null" else "map.getNoEntryValue"} && !map.containsKey(k)) {
+        val value = v  
+        map.put(k, value)
+        value
+      } else {
+        res
+      }
+    }
 
-		def putIfAbsent(k: ${K}, v: ${V}): Unit =
-			map.putIfAbsent(k, v)
+    def putIfAbsent(k: ${K}, v: ${V}): Unit =
+      map.putIfAbsent(k, v)
 
     override def getOrElse[VV >: ${V}](k: ${K}, v: => VV): VV =
       if (map.containsKey(k)) map.get(k) else v
@@ -126,10 +126,10 @@ package atrox.trove {
       }
     }
 
-		def valuesArray: Array[${V}] = ${
+    def valuesArray: Array[${V}] = ${
       if (_V == "Object") s"map.values.asInstanceOf[Array[T]]"
       else                s"map.values"
-		}
+    }
 
 
     override def keySet = ${
@@ -143,33 +143,33 @@ package atrox.trove {
     }
 
 
-		override def filter(p: ((${K}, ${V})) => Boolean): $AtroxType =
-			filter { (k, v) => p((k, v)) }
+    override def filter(p: ((${K}, ${V})) => Boolean): $AtroxType =
+      filter { (k, v) => p((k, v)) }
 
-		def filter(p: (${K}, ${V}) => Boolean): $AtroxType = {
-			val filteredTroveMap = new $TroveType(size)
+    def filter(p: (${K}, ${V}) => Boolean): $AtroxType = {
+      val filteredTroveMap = new $TroveType(size)
 
       val iter = map.iterator
-			while (iter.hasNext) {
+      while (iter.hasNext) {
         iter.advance()
         val k: $K = iter.key()
-				val v: $V = iter.value()
-				if (p(k, v)) {
-					filteredTroveMap.put(k, v)
-				}
-			}
+        val v: $V = iter.value()
+        if (p(k, v)) {
+          filteredTroveMap.put(k, v)
+        }
+      }
 
-			new $AtroxType(_map = filteredTroveMap)
-		}
+      new $AtroxType(_map = filteredTroveMap)
+    }
 
-		override def filterNot(p: ((${K}, ${V})) => Boolean): $AtroxType =
-			filter { (k, v) => !p((k, v)) }
+    override def filterNot(p: ((${K}, ${V})) => Boolean): $AtroxType =
+      filter { (k, v) => !p((k, v)) }
 
-		def filterNot(p: (${K}, ${V}) => Boolean): $AtroxType =
-			filter { (k, v) => !p(k, v) }
+    def filterNot(p: (${K}, ${V}) => Boolean): $AtroxType =
+      filter { (k, v) => !p(k, v) }
 
-		override def filterKeys(p: $K => Boolean): $AtroxType =
-			filter { (k, v) => p(k) }
+    override def filterKeys(p: $K => Boolean): $AtroxType =
+      filter { (k, v) => p(k) }
 
 
     override def retain(p: (${K}, ${V}) => Boolean): this.type = {
@@ -197,7 +197,7 @@ package atrox.trove {
       this
     }
 
-		override def toString = map.toString
+    override def toString = map.toString
 
     """ }
     
@@ -208,11 +208,11 @@ package atrox.trove {
 
 
 
-	// ========== Set ===========
+  // ========== Set ===========
 
 
   def mkSetClass(E: String) = {
-		s"""
+    s"""
 package atrox.trove {
 
   import gnu.trove.set.T${E}Set
@@ -224,20 +224,20 @@ package atrox.trove {
       (if (_set != null) _set else new T${E}HashSet(initialSize, loadFactor))
 
 
-		// ==== abstract methods ====
+    // ==== abstract methods ====
 
     def += (e: ${E}): this.type = {
-			set.add(e)
-			this
-		}
+      set.add(e)
+      this
+    }
 
     def -= (e: ${E}): this.type = {
-			set.remove(e)
-			this
-		}
+      set.remove(e)
+      this
+    }
 
     def contains (e: ${E}): Boolean =
-			set.contains(e)
+      set.contains(e)
 
     def iterator: collection.Iterator[${E}] = {
       val iter = set.iterator
@@ -259,47 +259,47 @@ package atrox.trove {
       this
     }
 
-		def ++= (xs: ${E}Set): this.type = {
-			set.addAll(xs.set)
-			this
-		}
+    def ++= (xs: ${E}Set): this.type = {
+      set.addAll(xs.set)
+      this
+    }
 
     override def --= (xs: TraversableOnce[${E}]): this.type = {
       for (x <- xs) set.remove(x)
       this
     }
 
-		def --= (xs: ${E}Set): this.type = {
-			set.removeAll(xs.set)
-			this
-		}
+    def --= (xs: ${E}Set): this.type = {
+      set.removeAll(xs.set)
+      this
+    }
 
     def --= (xs: Array[${E}]): this.type = {
       set.removeAll(xs)
       this
     }
 
-		def retainAll(xs: Seq[$E]): this.type = {
-			import scala.collection.JavaConverters._
-			set.retainAll(xs.asJava)
-			this
-		}
+    def retainAll(xs: Seq[$E]): this.type = {
+      import scala.collection.JavaConverters._
+      set.retainAll(xs.asJava)
+      this
+    }
 
-		def retainAll(xs: Array[$E]): this.type = {
-			set.retainAll(xs)
-			this
-		}
+    def retainAll(xs: Array[$E]): this.type = {
+      set.retainAll(xs)
+      this
+    }
 
-		def retainAll(xs: ${E}Set): this.type = {
-			set.retainAll(xs.set)
-			this
-		}
+    def retainAll(xs: ${E}Set): this.type = {
+      set.retainAll(xs.set)
+      this
+    }
 
     override def apply(e: ${E}): Boolean = set.contains(e)
 
-		def containsAll(xs: Array[$E]): Boolean = set.containsAll(xs)
+    def containsAll(xs: Array[$E]): Boolean = set.containsAll(xs)
 
-		def containsAll(xs: ${E}Set): Boolean = set.containsAll(xs.set)
+    def containsAll(xs: ${E}Set): Boolean = set.containsAll(xs.set)
 
     override def clear(): Unit = set.clear()
 
@@ -373,6 +373,6 @@ package atrox.trove {
 
 }
 """
-	}
+  }
 
 }
